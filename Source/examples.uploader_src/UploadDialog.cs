@@ -127,133 +127,135 @@ namespace Zenfolio.Examples.Uploader
     /// </summary>
     private void InitializeComponent()
     {
-        System.Resources.ResourceManager resources = new System.Resources.ResourceManager(typeof(UploadDialog));
-        this._lblUploading = new System.Windows.Forms.Label();
-        this._progress = new System.Windows.Forms.ProgressBar();
-        this._lblStatic1 = new System.Windows.Forms.Label();
-        this._lblStatic2 = new System.Windows.Forms.Label();
-        this._checkCloseOnComplete = new System.Windows.Forms.CheckBox();
-        this._btnView = new System.Windows.Forms.Button();
-        this._btnViewGallery = new System.Windows.Forms.Button();
-        this._btnCancel = new System.Windows.Forms.Button();
-        this._lblFileName = new System.Windows.Forms.Label();
-        this._lblDestination = new System.Windows.Forms.Label();
-        this._lblTransferRate = new System.Windows.Forms.Label();
-        this.SuspendLayout();
-        // 
-        // _lblUploading
-        // 
-        this._lblUploading.Location = new System.Drawing.Point(8, 32);
-        this._lblUploading.Name = "_lblUploading";
-        this._lblUploading.Size = new System.Drawing.Size(344, 16);
-        this._lblUploading.TabIndex = 0;
-        this._lblUploading.Text = "Uploading:";
-        // 
-        // _progress
-        // 
-        this._progress.Location = new System.Drawing.Point(8, 64);
-        this._progress.Name = "_progress";
-        this._progress.Size = new System.Drawing.Size(344, 16);
-        this._progress.TabIndex = 1;
-        // 
-        // _lblStatic1
-        // 
-        this._lblStatic1.Location = new System.Drawing.Point(8, 112);
-        this._lblStatic1.Name = "_lblStatic1";
-        this._lblStatic1.Size = new System.Drawing.Size(64, 16);
-        this._lblStatic1.TabIndex = 2;
-        this._lblStatic1.Text = "Upload to:";
-        // 
-        // _lblStatic2
-        // 
-        this._lblStatic2.Location = new System.Drawing.Point(8, 128);
-        this._lblStatic2.Name = "_lblStatic2";
-        this._lblStatic2.Size = new System.Drawing.Size(72, 16);
-        this._lblStatic2.TabIndex = 4;
-        this._lblStatic2.Text = "Transfer rate:";
-        // 
-        // _checkCloseOnComplete
-        // 
-        this._checkCloseOnComplete.Location = new System.Drawing.Point(8, 152);
-        this._checkCloseOnComplete.Name = "_checkCloseOnComplete";
-        this._checkCloseOnComplete.Size = new System.Drawing.Size(264, 16);
-        this._checkCloseOnComplete.TabIndex = 6;
-        this._checkCloseOnComplete.Text = "&Close this dialog box when upload completes";
-        // 
-        // _btnView
-        // 
-        this._btnView.Enabled = false;
-        this._btnView.Location = new System.Drawing.Point(96, 200);
-        this._btnView.Name = "_btnView";
-        this._btnView.Size = new System.Drawing.Size(80, 23);
-        this._btnView.TabIndex = 7;
-        this._btnView.Text = "&View";
-        this._btnView.Click += new System.EventHandler(this.OnView);
-        // 
-        // _btnViewGallery
-        // 
-        this._btnViewGallery.Enabled = false;
-        this._btnViewGallery.Location = new System.Drawing.Point(184, 200);
-        this._btnViewGallery.Name = "_btnViewGallery";
-        this._btnViewGallery.Size = new System.Drawing.Size(80, 23);
-        this._btnViewGallery.TabIndex = 8;
-        this._btnViewGallery.Text = "View &Gallery";
-        this._btnViewGallery.Click += new System.EventHandler(this.OnViewGallery);
-        // 
-        // _btnCancel
-        // 
-        this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-        this._btnCancel.Location = new System.Drawing.Point(272, 200);
-        this._btnCancel.Name = "_btnCancel";
-        this._btnCancel.Size = new System.Drawing.Size(80, 23);
-        this._btnCancel.TabIndex = 9;
-        this._btnCancel.Text = "Cancel";
-        this._btnCancel.Click += new System.EventHandler(this.OnCancel);
-        // 
-        // _lblFileName
-        // 
-        this._lblFileName.Location = new System.Drawing.Point(8, 48);
-        this._lblFileName.Name = "_lblFileName";
-        this._lblFileName.Size = new System.Drawing.Size(344, 16);
-        this._lblFileName.TabIndex = 10;
-        // 
-        // _lblDestination
-        // 
-        this._lblDestination.Location = new System.Drawing.Point(80, 112);
-        this._lblDestination.Name = "_lblDestination";
-        this._lblDestination.Size = new System.Drawing.Size(272, 16);
-        this._lblDestination.TabIndex = 3;
-        // 
-        // _lblTransferRate
-        // 
-        this._lblTransferRate.Location = new System.Drawing.Point(80, 128);
-        this._lblTransferRate.Name = "_lblTransferRate";
-        this._lblTransferRate.Size = new System.Drawing.Size(272, 16);
-        this._lblTransferRate.TabIndex = 5;
-        // 
-        // UploadDialog
-        // 
-        this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-        this.CancelButton = this._btnCancel;
-        this.ClientSize = new System.Drawing.Size(360, 237);
-        this.Controls.Add(this._lblTransferRate);
-        this.Controls.Add(this._lblDestination);
-        this.Controls.Add(this._lblFileName);
-        this.Controls.Add(this._btnCancel);
-        this.Controls.Add(this._btnViewGallery);
-        this.Controls.Add(this._btnView);
-        this.Controls.Add(this._checkCloseOnComplete);
-        this.Controls.Add(this._lblStatic2);
-        this.Controls.Add(this._lblStatic1);
-        this.Controls.Add(this._progress);
-        this.Controls.Add(this._lblUploading);
-        this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-        this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-        this.MaximizeBox = false;
-        this.Name = "UploadDialog";
-        this.Text = "Connecting...";
-        this.Load += new System.EventHandler(this.OnLoad);
-        this.ResumeLayout(false);
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UploadDialog));
+            this._lblUploading = new System.Windows.Forms.Label();
+            this._progress = new System.Windows.Forms.ProgressBar();
+            this._lblStatic1 = new System.Windows.Forms.Label();
+            this._lblStatic2 = new System.Windows.Forms.Label();
+            this._checkCloseOnComplete = new System.Windows.Forms.CheckBox();
+            this._btnView = new System.Windows.Forms.Button();
+            this._btnViewGallery = new System.Windows.Forms.Button();
+            this._btnCancel = new System.Windows.Forms.Button();
+            this._lblFileName = new System.Windows.Forms.Label();
+            this._lblDestination = new System.Windows.Forms.Label();
+            this._lblTransferRate = new System.Windows.Forms.Label();
+            this.SuspendLayout();
+            // 
+            // _lblUploading
+            // 
+            this._lblUploading.Location = new System.Drawing.Point(8, 32);
+            this._lblUploading.Name = "_lblUploading";
+            this._lblUploading.Size = new System.Drawing.Size(344, 16);
+            this._lblUploading.TabIndex = 0;
+            this._lblUploading.Text = "Uploading:";
+            // 
+            // _progress
+            // 
+            this._progress.Location = new System.Drawing.Point(8, 64);
+            this._progress.Name = "_progress";
+            this._progress.Size = new System.Drawing.Size(344, 16);
+            this._progress.TabIndex = 1;
+            // 
+            // _lblStatic1
+            // 
+            this._lblStatic1.Location = new System.Drawing.Point(8, 112);
+            this._lblStatic1.Name = "_lblStatic1";
+            this._lblStatic1.Size = new System.Drawing.Size(64, 16);
+            this._lblStatic1.TabIndex = 2;
+            this._lblStatic1.Text = "Upload to:";
+            // 
+            // _lblStatic2
+            // 
+            this._lblStatic2.Location = new System.Drawing.Point(8, 128);
+            this._lblStatic2.Name = "_lblStatic2";
+            this._lblStatic2.Size = new System.Drawing.Size(72, 16);
+            this._lblStatic2.TabIndex = 4;
+            this._lblStatic2.Text = "Transfer rate:";
+            // 
+            // _checkCloseOnComplete
+            // 
+            this._checkCloseOnComplete.Checked = true;
+            this._checkCloseOnComplete.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._checkCloseOnComplete.Location = new System.Drawing.Point(8, 152);
+            this._checkCloseOnComplete.Name = "_checkCloseOnComplete";
+            this._checkCloseOnComplete.Size = new System.Drawing.Size(264, 16);
+            this._checkCloseOnComplete.TabIndex = 6;
+            this._checkCloseOnComplete.Text = "&Close this dialog box when upload completes";
+            // 
+            // _btnView
+            // 
+            this._btnView.Enabled = false;
+            this._btnView.Location = new System.Drawing.Point(96, 200);
+            this._btnView.Name = "_btnView";
+            this._btnView.Size = new System.Drawing.Size(80, 23);
+            this._btnView.TabIndex = 7;
+            this._btnView.Text = "&View";
+            this._btnView.Click += new System.EventHandler(this.OnView);
+            // 
+            // _btnViewGallery
+            // 
+            this._btnViewGallery.Enabled = false;
+            this._btnViewGallery.Location = new System.Drawing.Point(184, 200);
+            this._btnViewGallery.Name = "_btnViewGallery";
+            this._btnViewGallery.Size = new System.Drawing.Size(80, 23);
+            this._btnViewGallery.TabIndex = 8;
+            this._btnViewGallery.Text = "View &Gallery";
+            this._btnViewGallery.Click += new System.EventHandler(this.OnViewGallery);
+            // 
+            // _btnCancel
+            // 
+            this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this._btnCancel.Location = new System.Drawing.Point(272, 200);
+            this._btnCancel.Name = "_btnCancel";
+            this._btnCancel.Size = new System.Drawing.Size(80, 23);
+            this._btnCancel.TabIndex = 9;
+            this._btnCancel.Text = "Cancel";
+            this._btnCancel.Click += new System.EventHandler(this.OnCancel);
+            // 
+            // _lblFileName
+            // 
+            this._lblFileName.Location = new System.Drawing.Point(8, 48);
+            this._lblFileName.Name = "_lblFileName";
+            this._lblFileName.Size = new System.Drawing.Size(344, 16);
+            this._lblFileName.TabIndex = 10;
+            // 
+            // _lblDestination
+            // 
+            this._lblDestination.Location = new System.Drawing.Point(80, 112);
+            this._lblDestination.Name = "_lblDestination";
+            this._lblDestination.Size = new System.Drawing.Size(272, 16);
+            this._lblDestination.TabIndex = 3;
+            // 
+            // _lblTransferRate
+            // 
+            this._lblTransferRate.Location = new System.Drawing.Point(80, 128);
+            this._lblTransferRate.Name = "_lblTransferRate";
+            this._lblTransferRate.Size = new System.Drawing.Size(272, 16);
+            this._lblTransferRate.TabIndex = 5;
+            // 
+            // UploadDialog
+            // 
+            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            this.CancelButton = this._btnCancel;
+            this.ClientSize = new System.Drawing.Size(360, 237);
+            this.Controls.Add(this._lblTransferRate);
+            this.Controls.Add(this._lblDestination);
+            this.Controls.Add(this._lblFileName);
+            this.Controls.Add(this._btnCancel);
+            this.Controls.Add(this._btnViewGallery);
+            this.Controls.Add(this._btnView);
+            this.Controls.Add(this._checkCloseOnComplete);
+            this.Controls.Add(this._lblStatic2);
+            this.Controls.Add(this._lblStatic1);
+            this.Controls.Add(this._progress);
+            this.Controls.Add(this._lblUploading);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.Name = "UploadDialog";
+            this.Text = "Connecting...";
+            this.Load += new System.EventHandler(this.OnLoad);
+            this.ResumeLayout(false);
 
     }
     #endregion

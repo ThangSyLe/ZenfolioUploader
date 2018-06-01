@@ -213,7 +213,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del ..\..\..\..\bin\$(ConfigurationName)\$(ProjectName)_*.zip &gt;nul 2&gt;&amp;1</PreBuildEvent>
-    <PostBuildEvent>..\..\..\package.cmd $(ProjectName) $(ConfigurationName)</PostBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

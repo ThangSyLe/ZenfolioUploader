@@ -28,6 +28,7 @@ using System.Windows.Forms;
 using System.IO;
 
 using Zenfolio.Examples.Uploader.ZfApiRef;
+using Zenfolio.Examples.Uploader.Properties;
 
 namespace Zenfolio.Examples.Uploader
 {
@@ -57,33 +58,26 @@ namespace Zenfolio.Examples.Uploader
                 bool loggedin = false;
                 while(!loggedin)
                 {
-                    // Ask for username/password
-                    DialogResult res = dlgLogin.ShowDialog();
-
-                    // Exit if user doesn't want to enter credentials
-                    if (res != DialogResult.OK)
-                        return 1;
-
                     // Try to login
-                    string login = dlgLogin._txtLogin.Text;
-                    string password = dlgLogin._txtPassword.Text;
+                    string login = "contact@enchantedpix.com"; // dlgLogin._txtLogin.Text;
+                    string password = "Ph0t0graphy!";          // dlgLogin._txtPassword.Text;
                     loggedin = _client.Login(login, password);
                 }
 
-                BrowseDialog dlgBrowse = new BrowseDialog(_client);
-                DialogResult dlgResult = dlgBrowse.ShowDialog();
-
-                // Exit if user doesn't want to select a gallery
-                if (dlgResult != DialogResult.OK)
-                    return 1;
-
                 //Load more detailed projection of selected gallery
-                PhotoSet gallery = _client.LoadPhotoSet(dlgBrowse.SelectedGallery.Id, InformatonLevel.Level1, false);
+                var gunghoGallery = 675105122405010023;
 
-                UploadDialog dlgUpload = new UploadDialog(_client, gallery, args[0], mimeType);
-                dlgResult = dlgUpload.ShowDialog();
-                if (dlgResult != DialogResult.OK)
-                    return 1;
+                PhotoSet gallery = _client.LoadPhotoSet(gunghoGallery, InformatonLevel.Level1, false);
+
+                var images = Directory.GetFiles(Settings.Default.ImageFolderPath);
+
+                foreach (var image in images)
+                {
+                    UploadDialog dlgUpload = new UploadDialog(_client, gallery, image, mimeType);
+                    var dlgResult = dlgUpload.ShowDialog();
+                    if (dlgResult != DialogResult.OK)
+                        return 1;
+                }
 
                 return 0;
             }
