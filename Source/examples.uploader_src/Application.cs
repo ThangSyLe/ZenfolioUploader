@@ -29,6 +29,11 @@ using System.IO;
 
 using Zenfolio.Examples.Uploader.ZfApiRef;
 using Zenfolio.Examples.Uploader.Properties;
+using Serilog;
+using Newtonsoft.Json;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace Zenfolio.Examples.Uploader
 {
@@ -43,48 +48,111 @@ namespace Zenfolio.Examples.Uploader
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static int Main(string[] args) 
+        static void Main(string[] args) 
         {
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.AppSettings()
+                .CreateLogger();
+
             try
             {
-                string mimeType = CheckCommandLine(args);
-                if (mimeType == null)
-                    return 2;
+                Log.Verbose("Main() Started");
+                Log.Debug("args[{Args}]", JsonConvert.SerializeObject(args));
 
-                LoginDialog dlgLogin = new LoginDialog();
+                Log.Information("----------- Application Started ----------- ");
+
+                string mimeType = "image/jpeg";
+
                 _client = new ZenfolioClient();
-        
-                // Try to login repeatedly
-                bool loggedin = false;
-                while(!loggedin)
-                {
-                    // Try to login
-                    string login = "contact@enchantedpix.com"; // dlgLogin._txtLogin.Text;
-                    string password = "Ph0t0graphy!";          // dlgLogin._txtPassword.Text;
-                    loggedin = _client.Login(login, password);
-                }
 
                 //Load more detailed projection of selected gallery
-                var gunghoGallery = 675105122405010023;
+                PhotoSet gallery = _client.LoadPhotoSet(Settings.Default.ZenfolioGalleryID, InformatonLevel.Level1, true);
+                Log.Debug("Found images [{ImageCount}] in Zenfolio GalleryID[{GalleryID}]", gallery.PhotoCount, Settings.Default.ZenfolioGalleryID);
 
-                PhotoSet gallery = _client.LoadPhotoSet(gunghoGallery, InformatonLevel.Level1, false);
 
-                var images = Directory.GetFiles(Settings.Default.ImageFolderPath);
-
-                foreach (var image in images)
+                bool loggedin = false;
+                while (true)
                 {
-                    UploadDialog dlgUpload = new UploadDialog(_client, gallery, image, mimeType);
-                    var dlgResult = dlgUpload.ShowDialog();
-                    if (dlgResult != DialogResult.OK)
-                        return 1;
-                }
+                    try
+                    {
+                        while (!loggedin)
+                        {
+                            Log.Debug("Attempting to log in as [{Login}]", Settings.Default.ZenfolioUserName);
+                            loggedin = _client.Login(Settings.Default.ZenfolioUserName, Settings.Default.ZenfolioPassword);
+                        }
 
-                return 0;
+                        var imagePaths = Directory.GetFiles(Settings.Default.ImageFolderPath);
+                        Log.Debug("Found images [{ImagesCount}] in directory[{Directory}]", imagePaths.Length, Settings.Default.ImageFolderPath);
+
+                        var newImageFileInfos = GetNewImageFileInfos(gallery, imagePaths);
+
+                        if (newImageFileInfos.Count() > 0)
+                        {
+                            UploadImages(newImageFileInfos, gallery, mimeType);
+                        }
+
+                        imagePaths = Directory.GetFiles(Settings.Default.ImageFolderPath);
+                        newImageFileInfos = GetNewImageFileInfos(gallery, imagePaths);
+
+                        Thread.Sleep(Settings.Default.WaitTimeInSec * 1000);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, ex.Message);
+                    }
+                }
             }
             catch(Exception e)
             {
-                MessageBox.Show(e.ToString(), "Exception");
-                return 2;
+                Log.Error(e, e.Message);
+            }
+        }
+
+        private static List<FileInfo> GetNewImageFileInfos(PhotoSet gallery, string[] imagePaths)
+        {
+            var imageFileInfos = new List<FileInfo>();
+            foreach (var imagePath in imagePaths)
+            {
+                var imageFileinfo = new FileInfo(imagePath);
+
+                if (!gallery.Photos.Any(p => p.FileName == imageFileinfo.Name))
+                {
+                    imageFileInfos.Add(imageFileinfo);
+                }
+            }
+
+            return imageFileInfos;
+        }
+
+        private static void UploadImages(List<FileInfo> imageFileInfos, PhotoSet gallery, string mimeType)
+        {
+            Log.Debug("New images to upload count[{ImagesCount}]", imageFileInfos.Count());
+
+            foreach (var imageFileInfo in imageFileInfos)
+            {
+                Log.Debug("Attempting to upload file[{ImagePath}]", imageFileInfo.Name);
+
+                if (!gallery.Photos.Any(photos => imageFileInfo.Name == photos.FileName))
+                {
+                    UploadDialog dlgUpload = new UploadDialog(_client, gallery, imageFileInfo.FullName, mimeType);
+
+                    var dlgResult = dlgUpload.ShowDialog();
+
+                    var galleryPhotos = gallery.Photos.ToList();
+
+                    galleryPhotos.Add(new Photo
+                    {
+                        FileName = imageFileInfo.Name
+                    });
+
+                    gallery.Photos = galleryPhotos.ToArray();
+
+                    Log.Information("Uploaded file[{ImageFileName}] successfully", imageFileInfo.Name);
+                }
+                else
+                {
+                    Log.Debug("File[{FileName}] already uploaded", imageFileInfo.Name);
+                }
             }
         }
 

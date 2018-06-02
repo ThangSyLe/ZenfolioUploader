@@ -41,5 +41,44 @@ namespace Zenfolio.Examples.Uploader.Properties {
                 return ((string)(this["ImageFolderPath"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("675105122405010023")]
+        public long ZenfolioGalleryID {
+            get {
+                return ((long)(this["ZenfolioGalleryID"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("contact@enchantedpix.com")]
+        public string ZenfolioUserName {
+            get {
+                return ((string)(this["ZenfolioUserName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ph0t0graphy!")]
+        public string ZenfolioPassword {
+            get {
+                return ((string)(this["ZenfolioPassword"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int WaitTimeInSec {
+            get {
+                return ((int)(this["WaitTimeInSec"]));
+            }
+            set {
+                this["WaitTimeInSec"] = value;
+            }
+        }
     }
 }

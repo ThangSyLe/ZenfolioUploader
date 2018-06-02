@@ -8,5 +8,17 @@
     <Setting Name="ImageFolderPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">C:\Users\thang\Pictures\Google Earth VR</Value>
     </Setting>
+    <Setting Name="ZenfolioGalleryID" Type="System.Int64" Scope="Application">
+      <Value Profile="(Default)">675105122405010023</Value>
+    </Setting>
+    <Setting Name="ZenfolioUserName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">contact@enchantedpix.com</Value>
+    </Setting>
+    <Setting Name="ZenfolioPassword" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Ph0t0graphy!</Value>
+    </Setting>
+    <Setting Name="WaitTimeInSec" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
