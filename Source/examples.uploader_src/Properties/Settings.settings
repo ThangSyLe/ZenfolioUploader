@@ -6,7 +6,7 @@
       <Value Profile="(Default)">http://api.zenfolio.com/api/1.7/zfapi.asmx</Value>
     </Setting>
     <Setting Name="ImageFolderPath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">C:\Users\thang\Pictures\Google Earth VR</Value>
+      <Value Profile="(Default)">C:\temp\gungho_e3</Value>
     </Setting>
     <Setting Name="ZenfolioUserName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">contact@enchantedpix.com</Value>

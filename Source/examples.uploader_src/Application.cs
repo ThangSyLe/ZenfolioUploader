@@ -64,6 +64,9 @@ namespace Zenfolio.Examples.Uploader
                 string mimeType = "image/jpeg";
 
                 bool loggedin = false;
+                long galleryID = 0;
+                string galleryName = "";
+
                 _client = new ZenfolioClient();
 
 
@@ -84,8 +87,11 @@ namespace Zenfolio.Examples.Uploader
                     BrowseDialog dlgBrowse = new BrowseDialog(_client);
                     DialogResult dlgResult = dlgBrowse.ShowDialog();
 
-                    gallery = _client.LoadPhotoSet(dlgBrowse.SelectedGallery.Id, InformatonLevel.Level1, true);
-                    Log.Information("Loaded Gallery [{Title}]", gallery.Title);
+                    galleryID = dlgBrowse.SelectedGallery.Id;
+                    galleryName = dlgBrowse.SelectedGallery.Title;
+
+                    gallery = _client.LoadPhotoSet(galleryID, InformatonLevel.Level1, true);
+                    Log.Information("Loaded Gallery [{Title}]", galleryName);
                 }
                 
                 Log.Debug("Found images [{ImageCount}] in Zenfolio GalleryID[{GalleryID}]", gallery.PhotoCount, gallery.Id);
@@ -94,7 +100,14 @@ namespace Zenfolio.Examples.Uploader
                 {
                     try
                     {
-                        var imagePaths = Directory.GetFiles(Settings.Default.ImageFolderPath);
+                        var imageFolderPath = Settings.Default.ImageFolderPath + $"//{galleryName}";
+
+                        if (!Directory.Exists(imageFolderPath))
+                        {
+                            Directory.CreateDirectory(imageFolderPath);
+                        }
+
+                        var imagePaths = Directory.GetFiles(imageFolderPath);
                         Log.Debug("Found images [{ImagesCount}] in directory[{Directory}]", imagePaths.Length, Settings.Default.ImageFolderPath);
 
                         var newImageFileInfos = GetNewImageFileInfos(gallery, imagePaths);
