@@ -18,7 +18,7 @@
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="ZenfolioGalleryID" Type="System.String" Scope="Application">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">675105122360722665</Value>
     </Setting>
   </Settings>
 </SettingsFile>

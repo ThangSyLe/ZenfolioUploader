@@ -140,16 +140,39 @@ namespace Zenfolio.Examples.Uploader
             }
         }
 
+        private static bool IsFileLocked(string filePath)
+        {
+            try
+            {
+                using (System.IO.File.Open(filePath, FileMode.Open)) { }
+            }
+            catch (IOException e)
+            {
+                var errorCode = System.Runtime.InteropServices.Marshal.GetHRForException(e) & ((1 << 16) - 1);
+
+                return errorCode == 32 || errorCode == 33;
+            }
+
+            return false;
+        }
+
         private static List<FileInfo> GetNewImageFileInfos(PhotoSet gallery, string[] imagePaths)
         {
             var imageFileInfos = new List<FileInfo>();
             foreach (var imagePath in imagePaths)
             {
-                var imageFileinfo = new FileInfo(imagePath);
-
-                if (!gallery.Photos.Any(p => p.FileName == imageFileinfo.Name))
+                if (IsFileLocked(imagePath))
                 {
-                    imageFileInfos.Add(imageFileinfo);
+                    Log.Debug("File [{FilePath}] is locked so it's being ignored", imagePath);
+                }
+                else
+                {
+                    var imageFileinfo = new FileInfo(imagePath);
+
+                    if (!gallery.Photos.Any(p => p.FileName == imageFileinfo.Name))
+                    {
+                        imageFileInfos.Add(imageFileinfo);
+                    }
                 }
             }
 

@@ -74,7 +74,7 @@ namespace Zenfolio.Examples.Uploader.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("675105122360722665")]
         public string ZenfolioGalleryID {
             get {
                 return ((string)(this["ZenfolioGalleryID"]));
