@@ -63,24 +63,37 @@ namespace Zenfolio.Examples.Uploader
 
                 string mimeType = "image/jpeg";
 
+                bool loggedin = false;
                 _client = new ZenfolioClient();
 
+
+                while (!loggedin)
+                {
+                    Log.Debug("Attempting to log in as [{Login}]", Settings.Default.ZenfolioUserName);
+                    loggedin = _client.Login(Settings.Default.ZenfolioUserName, Settings.Default.ZenfolioPassword);
+                }
+
                 //Load more detailed projection of selected gallery
-                PhotoSet gallery = _client.LoadPhotoSet(Settings.Default.ZenfolioGalleryID, InformatonLevel.Level1, true);
-                Log.Debug("Found images [{ImageCount}] in Zenfolio GalleryID[{GalleryID}]", gallery.PhotoCount, Settings.Default.ZenfolioGalleryID);
+                PhotoSet gallery = new PhotoSet();
+                if (!string.IsNullOrEmpty(Settings.Default.ZenfolioGalleryID))
+                {
+                    gallery = _client.LoadPhotoSet(Convert.ToInt64(Settings.Default.ZenfolioGalleryID), InformatonLevel.Level1, true);
+                }
+                else
+                {
+                    BrowseDialog dlgBrowse = new BrowseDialog(_client);
+                    DialogResult dlgResult = dlgBrowse.ShowDialog();
 
-
-                bool loggedin = false;
+                    gallery = _client.LoadPhotoSet(dlgBrowse.SelectedGallery.Id, InformatonLevel.Level1, true);
+                    Log.Information("Loaded Gallery [{Title}]", gallery.Title);
+                }
+                
+                Log.Debug("Found images [{ImageCount}] in Zenfolio GalleryID[{GalleryID}]", gallery.PhotoCount, gallery.Id);
+                
                 while (true)
                 {
                     try
                     {
-                        while (!loggedin)
-                        {
-                            Log.Debug("Attempting to log in as [{Login}]", Settings.Default.ZenfolioUserName);
-                            loggedin = _client.Login(Settings.Default.ZenfolioUserName, Settings.Default.ZenfolioPassword);
-                        }
-
                         var imagePaths = Directory.GetFiles(Settings.Default.ImageFolderPath);
                         Log.Debug("Found images [{ImagesCount}] in directory[{Directory}]", imagePaths.Length, Settings.Default.ImageFolderPath);
 

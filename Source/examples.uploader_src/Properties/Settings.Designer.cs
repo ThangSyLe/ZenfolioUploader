@@ -44,15 +44,6 @@ namespace Zenfolio.Examples.Uploader.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("675105122405010023")]
-        public long ZenfolioGalleryID {
-            get {
-                return ((long)(this["ZenfolioGalleryID"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("contact@enchantedpix.com")]
         public string ZenfolioUserName {
             get {
@@ -78,6 +69,15 @@ namespace Zenfolio.Examples.Uploader.Properties {
             }
             set {
                 this["WaitTimeInSec"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ZenfolioGalleryID {
+            get {
+                return ((string)(this["ZenfolioGalleryID"]));
             }
         }
     }
