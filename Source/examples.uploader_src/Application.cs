@@ -93,9 +93,9 @@ namespace Zenfolio.Examples.Uploader
                     gallery = _client.LoadPhotoSet(galleryID, InformatonLevel.Level1, true);
                     Log.Information("Loaded Gallery [{Title}]", galleryName);
                 }
-                
+
                 Log.Debug("Found images [{ImageCount}] in Zenfolio GalleryID[{GalleryID}]", gallery.PhotoCount, gallery.Id);
-                
+
                 while (true)
                 {
                     try
@@ -128,9 +128,13 @@ namespace Zenfolio.Examples.Uploader
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Log.Error(e, e.Message);
+            }
+            finally
+            {
+                Log.CloseAndFlush();
             }
         }
 
