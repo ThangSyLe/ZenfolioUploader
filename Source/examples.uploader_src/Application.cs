@@ -108,7 +108,7 @@ namespace Zenfolio.Examples.Uploader
                         }
 
                         var imagePaths = Directory.GetFiles(imageFolderPath);
-                        Log.Debug("Found images [{ImagesCount}] in directory[{Directory}]", imagePaths.Length, Settings.Default.ImageFolderPath);
+                        Log.Debug("Found images [{ImagesCount}] in directory[{Directory}]", imagePaths.Length, imageFolderPath);
 
                         var newImageFileInfos = GetNewImageFileInfos(gallery, imagePaths);
 
@@ -117,7 +117,6 @@ namespace Zenfolio.Examples.Uploader
                             UploadImages(newImageFileInfos, gallery, mimeType);
                         }
 
-                        imagePaths = Directory.GetFiles(Settings.Default.ImageFolderPath);
                         newImageFileInfos = GetNewImageFileInfos(gallery, imagePaths);
 
                         Thread.Sleep(Settings.Default.WaitTimeInSec * 1000);
