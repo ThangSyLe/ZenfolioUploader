@@ -81,6 +81,9 @@ namespace Zenfolio.Examples.Uploader
                 if (!string.IsNullOrEmpty(Settings.Default.ZenfolioGalleryID))
                 {
                     gallery = _client.LoadPhotoSet(Convert.ToInt64(Settings.Default.ZenfolioGalleryID), InformatonLevel.Level1, true);
+
+                    galleryID = gallery.Id;
+                    galleryName = gallery.Title;
                 }
                 else
                 {
