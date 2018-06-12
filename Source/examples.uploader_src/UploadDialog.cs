@@ -23,6 +23,7 @@
 // Upload dialog.
 //
 
+using Serilog;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -91,16 +92,16 @@ namespace Zenfolio.Examples.Uploader
         /// <param name="filePath">Path of the image to be uploaded.</param>
         /// <param name="mimeType">MIME type of the image.</param>
         public UploadDialog(
-            ZenfolioClient client, 
-            PhotoSet gallery, 
-            string filePath, 
+            ZenfolioClient client,
+            PhotoSet gallery,
+            string filePath,
             string mimeType
             )
         {
             _client = client;
             _gallery = gallery;
             _fileInfo = new FileInfo(filePath);
-            _totalChunks = (int) _fileInfo.Length / 1024;
+            _totalChunks = (int)_fileInfo.Length / 1024;
 
             _mimeType = mimeType;
             InitializeComponent();
@@ -121,12 +122,12 @@ namespace Zenfolio.Examples.Uploader
         }
 
         #region Windows Form Designer generated code
-    /// <summary>
-    /// Required method for Designer support - do not modify
-    /// the contents of this method with the code editor.
-    /// </summary>
-    private void InitializeComponent()
-    {
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UploadDialog));
             this._lblUploading = new System.Windows.Forms.Label();
             this._progress = new System.Windows.Forms.ProgressBar();
@@ -257,8 +258,8 @@ namespace Zenfolio.Examples.Uploader
             this.Load += new System.EventHandler(this.OnLoad);
             this.ResumeLayout(false);
 
-    }
-    #endregion
+        }
+        #endregion
 
         /// <summary>
         /// Builds upload url
@@ -275,25 +276,27 @@ namespace Zenfolio.Examples.Uploader
         /// <summary>
         /// Uploading procedure
         /// </summary>
-        public void UploadProc() 
+        public void UploadProc()
         {
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(BuildUrl(_fileInfo));
-            req.AllowWriteStreamBuffering = false;
-            req.Method = "POST";
-        
-            // put correct user token in request headers
-            req.Headers.Add("X-Zenfolio-Token", _client.Token);
-            req.ContentType = _mimeType;
-            req.ContentLength = _fileInfo.Length;
-
-            // Prepare to read the file and push it into request stream
-            BinaryReader fileReader = new BinaryReader(
-            new FileStream(_fileInfo.FullName, FileMode.Open));
-            Stream requestStream = req.GetRequestStream();
-
             // Upload the data
+            BinaryReader fileReader = null;
+            Stream requestStream = null;
             try
             {
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create(BuildUrl(_fileInfo));
+                req.AllowWriteStreamBuffering = false;
+                req.Method = "POST";
+
+                // put correct user token in request headers
+                req.Headers.Add("X-Zenfolio-Token", _client.Token);
+                req.ContentType = _mimeType;
+                req.ContentLength = _fileInfo.Length;
+
+                // Prepare to read the file and push it into request stream
+                fileReader = new BinaryReader(new FileStream(_fileInfo.FullName, FileMode.Open));
+                requestStream = req.GetRequestStream();
+
+
                 // Create a buffer for image data
                 const int bufSize = 1024;
                 byte[] buffer = new byte[bufSize];
@@ -312,10 +315,39 @@ namespace Zenfolio.Examples.Uploader
                     //Notify UI
                     this.Invoke(new MethodInvoker(this.OnProgress));
                 }
+
+                try
+                {
+                    // Read image ID from the response
+                    WebResponse response = req.GetResponse();
+                    TextReader responseReader = new StreamReader(response.GetResponseStream());
+
+                    string imageId = responseReader.ReadToEnd();
+
+                    //TODO load photo and construct url for View button
+                    //_client.LoadPhoto(id);
+
+                    // Inform UI that upload finished
+                    this.Invoke(new MethodInvoker(this.OnComplete));
+                }
+                catch (Exception e)
+                {
+                    //this.Invoke(new ExceptionHandler(this.OnError), new object[] { e });
+                    Log.Error(e, e.Message);
+                    _uploadThread.Interrupt();
+                }
             }
-            catch (ThreadInterruptedException)
+            catch (ThreadInterruptedException tex)
             {
+                Log.Error(tex, tex.Message);
+                _uploadThread.Interrupt();
                 // User aborted
+                return;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, ex.Message);
+                _uploadThread.Interrupt();
                 return;
             }
             finally
@@ -331,24 +363,6 @@ namespace Zenfolio.Examples.Uploader
                 }
             }
 
-            try
-            {
-                // Read image ID from the response
-                WebResponse response = req.GetResponse();
-                TextReader responseReader = new StreamReader(response.GetResponseStream());
-
-                string imageId = responseReader.ReadToEnd();
-
-                //TODO load photo and construct url for View button
-                //_client.LoadPhoto(id);
-
-                // Inform UI that upload finished
-                this.Invoke(new MethodInvoker(this.OnComplete));
-            }
-            catch (Exception e)
-            {
-                this.Invoke(new ExceptionHandler(this.OnError), new object[]{e});
-            }
         }
 
         /// <summary>
@@ -398,7 +412,7 @@ namespace Zenfolio.Examples.Uploader
         private void OnViewGallery(object sender, EventArgs e)
         {
             // Compute gallery url
-            string url = String.Format("{0}/{1}/p{2}/edit", 
+            string url = String.Format("{0}/{1}/p{2}/edit",
                 _client.Authority, _client.LoginName, _gallery.Id);
 
             // Open it in default browser
@@ -432,8 +446,8 @@ namespace Zenfolio.Examples.Uploader
             _btnCancel.Enabled = false;
 
             //Display error message
-            MessageBox.Show(e.ToString(),"Exception", 
-            MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //MessageBox.Show(e.ToString(), "Exception",
+            //MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             //Close dialog
             this.DialogResult = DialogResult.Cancel;
@@ -449,18 +463,18 @@ namespace Zenfolio.Examples.Uploader
             //Calculate progress
             _chunkNumber += 1;
             int percentComplete = _chunkNumber * 100 / _totalChunks;
-            string caption = String.Format("{0}% of {1} Completed", 
+            string caption = String.Format("{0}% of {1} Completed",
             percentComplete, _fileInfo.Name);
             TimeSpan elapsed = DateTime.Now - _startTime;
-        
+
             double rate = _chunkNumber * 1000000L / elapsed.TotalMilliseconds;
             string unit = "B";
-            if(rate > 1000)
+            if (rate > 1000)
             {
                 rate /= 1000;
                 unit = "KB";
             }
-            if(rate > 1000)
+            if (rate > 1000)
             {
                 rate /= 1000;
                 unit = "MB";

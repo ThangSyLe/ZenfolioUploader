@@ -34,6 +34,8 @@ using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
+using System.Net;
+using System.Web;
 
 namespace Zenfolio.Examples.Uploader
 {
@@ -48,7 +50,7 @@ namespace Zenfolio.Examples.Uploader
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string[] args) 
+        static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings()
@@ -99,6 +101,7 @@ namespace Zenfolio.Examples.Uploader
 
                 Log.Debug("Found images [{ImageCount}] in Zenfolio GalleryID[{GalleryID}]", gallery.PhotoCount, gallery.Id);
 
+                var previousImageCount = 0;
                 while (true)
                 {
                     try
@@ -111,22 +114,30 @@ namespace Zenfolio.Examples.Uploader
                         }
 
                         var imagePaths = Directory.GetFiles(imageFolderPath);
-                        Log.Debug("Found images [{ImagesCount}] in directory[{Directory}]", imagePaths.Length, imageFolderPath);
 
-                        var newImageFileInfos = GetNewImageFileInfos(gallery, imagePaths);
-
-                        if (newImageFileInfos.Count() > 0)
+                        if (imagePaths.Count() > previousImageCount)
                         {
-                            UploadImages(newImageFileInfos, gallery, mimeType);
-                        }
+                            Log.Debug("Found images [{ImagesCount}] in directory[{Directory}]", imagePaths.Length, imageFolderPath);
 
-                        newImageFileInfos = GetNewImageFileInfos(gallery, imagePaths);
+                            var newImageFileInfos = GetNewImageFileInfos(gallery, imagePaths);
+
+                            if (newImageFileInfos.Count() > 0)
+                            {
+                                UploadImages(newImageFileInfos, gallery, mimeType);
+
+                                newImageFileInfos = GetNewImageFileInfos(gallery, imagePaths);
+
+                                previousImageCount = imagePaths.Count();
+                            }
+
+                        }
 
                         Thread.Sleep(Settings.Default.WaitTimeInSec * 1000);
                     }
                     catch (Exception ex)
                     {
                         Log.Error(ex, ex.Message);
+                        Thread.Sleep(Settings.Default.WaitTimeInSec * 1000);
                     }
                 }
             }
@@ -189,9 +200,7 @@ namespace Zenfolio.Examples.Uploader
 
                 if (!gallery.Photos.Any(photos => imageFileInfo.Name == photos.FileName))
                 {
-                    UploadDialog dlgUpload = new UploadDialog(_client, gallery, imageFileInfo.FullName, mimeType);
-
-                    var dlgResult = dlgUpload.ShowDialog();
+                    UploadProc(imageFileInfo, gallery, mimeType);
 
                     var galleryPhotos = gallery.Photos.ToList();
 
@@ -203,6 +212,7 @@ namespace Zenfolio.Examples.Uploader
                     gallery.Photos = galleryPhotos.ToArray();
 
                     Log.Information("Uploaded file[{ImageFileName}] successfully", imageFileInfo.Name);
+
                 }
                 else
                 {
@@ -220,14 +230,14 @@ namespace Zenfolio.Examples.Uploader
         {
             if (args == null || args.Length < 1)
             {
-                MessageBox.Show("Missing command line parameters", "Error", 
+                MessageBox.Show("Missing command line parameters", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
 
             if (args.Length > 1)
             {
-                MessageBox.Show("Can upload only one image at a time", "Error", 
+                MessageBox.Show("Can upload only one image at a time", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
@@ -236,7 +246,7 @@ namespace Zenfolio.Examples.Uploader
             {
                 if (!System.IO.File.Exists(args[0]))
                 {
-                    MessageBox.Show("File doesn't exist", "Error", 
+                    MessageBox.Show("File doesn't exist", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
                 }
@@ -244,7 +254,7 @@ namespace Zenfolio.Examples.Uploader
                 FileInfo fi = new FileInfo(args[0]);
                 if ((fi.Attributes & FileAttributes.Directory) != 0)
                 {
-                    MessageBox.Show("Cannot upload directories", "Error", 
+                    MessageBox.Show("Cannot upload directories", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
                 }
@@ -270,17 +280,98 @@ namespace Zenfolio.Examples.Uploader
                         return "image/gif";
 
                     default:
-                        MessageBox.Show("Unsupported file type", "Error", 
+                        MessageBox.Show("Unsupported file type", "Error",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return null;
                 }
             }
             catch
             {
-                MessageBox.Show("Can't read image file", "Error", 
+                MessageBox.Show("Can't read image file", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
-            }	    
+            }
+        }
+
+        /// <summary>
+        /// Builds upload url
+        /// </summary>
+        /// <returns>Url to use for image upload.</returns>
+        private static string BuildUrl(FileInfo fileInfo, PhotoSet gallery)
+        {
+            // append query parameters that describe the file being uploaded
+            // to the base upload URL
+            return String.Format("{0}?filename={1}", gallery.UploadUrl,
+                                 HttpUtility.UrlEncode(fileInfo.Name));
+        }
+
+        /// <summary>
+        /// Uploading procedure
+        /// </summary>
+        public static void UploadProc(FileInfo imageFile, PhotoSet gallery, string mimeType)
+        {
+            // Upload the data
+            BinaryReader fileReader = null;
+            Stream requestStream = null;
+
+            try
+            {
+
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create(BuildUrl(imageFile, gallery));
+                req.AllowWriteStreamBuffering = false;
+                req.Method = "POST";
+
+                // put correct user token in request headers
+                req.Headers.Add("X-Zenfolio-Token", _client.Token);
+                req.ContentType = mimeType;
+                req.ContentLength = imageFile.Length;
+
+                // Prepare to read the file and push it into request stream
+                fileReader = new BinaryReader(new FileStream(imageFile.FullName, FileMode.Open));
+                requestStream = req.GetRequestStream();
+
+
+                // Create a buffer for image data
+                const int bufSize = 1024;
+                byte[] buffer = new byte[bufSize];
+                int chunkLength = 0;
+
+                // Transfer data
+                while ((chunkLength = fileReader.Read(buffer, 0, bufSize)) > 0)
+                {
+                    requestStream.Write(buffer, 0, chunkLength);
+
+                    //Enter sleep state for Thread.Interrupt() to work
+                    //result.AsyncWaitHandle.WaitOne();
+                    //requestStream.EndWrite(result);
+
+                    //Notify UI
+                    //this.Invoke(new MethodInvoker(this.OnProgress));
+                }
+
+
+                // Read image ID from the response
+                WebResponse response = req.GetResponse();
+                TextReader responseReader = new StreamReader(response.GetResponseStream());
+
+                string imageId = responseReader.ReadToEnd();
+
+                //TODO load photo and construct url for View button
+                //_client.LoadPhoto(id);
+
+                // Inform UI that upload finished
+                //this.Invoke(new MethodInvoker(this.OnComplete));
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                fileReader.Close();
+                requestStream.Close();
+            }
         }
     }
 }
