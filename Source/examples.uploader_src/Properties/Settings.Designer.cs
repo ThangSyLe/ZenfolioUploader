@@ -60,24 +60,30 @@ namespace Zenfolio.Examples.Uploader.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int WaitTimeInSec {
             get {
                 return ((int)(this["WaitTimeInSec"]));
             }
-            set {
-                this["WaitTimeInSec"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("675105122570401517")]
+        public string ZenfolioGalleryID {
+            get {
+                return ((string)(this["ZenfolioGalleryID"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("675105122360722665")]
-        public string ZenfolioGalleryID {
+        [global::System.Configuration.DefaultSettingValueAttribute("675105122527579147")]
+        public string ZenfolioCollectionID {
             get {
-                return ((string)(this["ZenfolioGalleryID"]));
+                return ((string)(this["ZenfolioCollectionID"]));
             }
         }
     }

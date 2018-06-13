@@ -200,8 +200,14 @@ namespace Zenfolio.Examples.Uploader
 
                 if (!gallery.Photos.Any(photos => imageFileInfo.Name == photos.FileName))
                 {
-                    UploadProc(imageFileInfo, gallery, mimeType);
+                    var photoId = UploadProc(imageFileInfo, gallery, mimeType);
 
+                    if (!string.IsNullOrEmpty(Settings.Default.ZenfolioCollectionID))
+                    {
+                        _client.CollectionAddPhoto(Convert.ToInt64(Settings.Default.ZenfolioCollectionID), Convert.ToInt64(photoId));
+                        Log.Information("Added PhotoId[{PhotoId} into CollectionId(CollectionId)]", photoId, Settings.Default.ZenfolioCollectionID);
+                    }
+                    
                     var galleryPhotos = gallery.Photos.ToList();
 
                     galleryPhotos.Add(new Photo
@@ -308,7 +314,7 @@ namespace Zenfolio.Examples.Uploader
         /// <summary>
         /// Uploading procedure
         /// </summary>
-        public static void UploadProc(FileInfo imageFile, PhotoSet gallery, string mimeType)
+        public static string UploadProc(FileInfo imageFile, PhotoSet gallery, string mimeType)
         {
             // Upload the data
             BinaryReader fileReader = null;
@@ -356,6 +362,7 @@ namespace Zenfolio.Examples.Uploader
 
                 string imageId = responseReader.ReadToEnd();
 
+                return imageId;
                 //TODO load photo and construct url for View button
                 //_client.LoadPhoto(id);
 
